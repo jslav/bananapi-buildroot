@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ln -s /lib/ld-2.18.so /lib/ld-linux-armhf.so.3

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+modprobe sunxi_cedar_mod
+chmod 777 /dev/disp
+chmod 777 /dev/cedar_dev
+
+exit $?
