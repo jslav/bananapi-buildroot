@@ -1,4 +1,21 @@
-How to build a basic os with vlc:
+#Building kernel
+All instructions can be found here.
+http://wiki.lemaker.org/BananaPro/Pi:Building_u-boot,_script.bin_and_linux-kernel
+I recommend to use BSP way. 
+After done extract output. Copy everything from /boot and /kernel to some folder (for example, /boot)
+Create a file called uEnv.txt in the same folder.
+Fill this file with the folowwing lines:
+
+*bootargs=console=ttyS0,115200 console=tty0 disp.screen0_output_mode=EDID:1280x720p50 hdmi.audio=EDID:0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait*
+*aload_script=fatload mmc 0 0x43000000 script.bin;*
+*aload_kernel=fatload mmc 0 0x48000000 uImage; bootm 0x48000000;*
+*uenvcmd=run aload_script aload_kernel*
+
+#Building rootfs
+Download bananapi-buildroot and cd to this folder.
+
+Run command *make nconfig*.
+In buildroot menu do the folowing steps:
 1) Configure system type (ARM, CORTEX-A7)
 2) Select latest sourcery toolchain (external toolchain)
 3) Add libcedarx package (Hardware Handling)
@@ -10,3 +27,26 @@ Login: pavel
 Password: pi
 8) In System Configuration set path for system overlay (board/promwad/bananapi/rootfs_overlay)
 This will add init scripts for system and sunxi kernel module.
+
+Now exit with *f9* and run *make*. Process may take up to 15 minutes. 
+If you see "THIS IS NOT YOUR ROOT FILESYSTEM" everything is ok.
+Now go to bananapi-buildroot/output/target. Extract .tar archive to convinient folder.
+
+#Preparing SD card
+Install gparted. Now open it, delete all the partitions on your SD card. 
+Create a new partition (fat16, 20 MB) with label *boot* and add boot flag.
+Create a new partition (ext4, >300 MB) with label *root*.
+
+Copy everything from your *boot* folder to *boot* partition.
+Copy everything from your *rootfs* folder to *root* partition.
+In your terminal enter command *sync*.
+Unmount partitions and eject SD card.
+
+#Check vlc
+Insert your SD card to Banana Pi and turn it on.
+Login: pavel
+Password: pi
+
+Cd to /home/pavel.
+Run vlc:
+*cvlc --demux ffmpeg --codec cedar --vout cedarfb --no-osd --no-audio philips_air_show.ts*
